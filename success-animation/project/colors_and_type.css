@@ -1,0 +1,264 @@
+/* ==========================================================================
+   5mins Design System — Colors & Type Tokens
+   Reconstructed from Figma "Library.fig"
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap");
+
+/* Harabara Mais Demo is the display/logo face. Substituted with Anton
+   (nearest Google Fonts match: tall, heavy, geometric sans) until real
+   files are provided. */
+@import url("https://fonts.googleapis.com/css2?family=Anton&display=swap");
+
+:root {
+  /* --------------------------------------------------------------------
+     PRIMARY  — the 5mins cyan/teal
+     -------------------------------------------------------------------- */
+  --primary-100: #ccf8fd;
+  --primary-200: #99f1fb;
+  --primary-300: #66e9f9;
+  --primary-400: #33e2f7;   /* Brand cyan (logo bg) */
+  --primary-500: #00cee6;   /* Hero primary */
+  --primary-600: #00afc4;
+  --primary-700: #008393;
+  --primary-800: #005862;
+  --primary-900: #002c31;
+
+  /* Brand exact cyan from cover — used as the iconic background fill */
+  --brand-cyan: #00d3bf;
+
+  /* --------------------------------------------------------------------
+     SECONDARY — warm amber / gold (earned, highlight)
+     -------------------------------------------------------------------- */
+  --secondary-100: #fff8eb;
+  --secondary-200: #fff1d7;
+  --secondary-300: #ffe4af;
+  --secondary-400: #ffcf74;
+  --secondary-500: #ffbb38;
+  --secondary-600: #eda30d;
+  --secondary-700: #664b16;
+  --secondary-800: #33250b;
+  --secondary-900: #191306;
+
+  /* --------------------------------------------------------------------
+     SUCCESS — green
+     -------------------------------------------------------------------- */
+  --success-100: #e8f6ee;
+  --success-200: #d1eedd;
+  --success-300: #a3ddbc;
+  --success-400: #5dc389;
+  --success-500: #18a957;
+  --success-600: #11763d;
+  --success-700: #0a4423;
+  --success-800: #052211;
+  --success-900: #021109;
+
+  /* --------------------------------------------------------------------
+     WARNING — orange
+     -------------------------------------------------------------------- */
+  --warning-100: #ffedd7;
+  --warning-200: #ffdbaf;
+  --warning-300: #ffc988;
+  --warning-400: #ffb760;
+  --warning-500: #ffa538;
+  --warning-600: #e88206;
+  --warning-700: #996322;
+  --warning-800: #664216;
+  --warning-900: #33210b;
+
+  /* --------------------------------------------------------------------
+     DANGER — pink/red
+     -------------------------------------------------------------------- */
+  --danger-100: #fce8ec;
+  --danger-200: #f9d0d9;
+  --danger-300: #f2a2b3;
+  --danger-400: #e95c7b;
+  --danger-500: #df1642;
+  --danger-600: #9c0f2e;
+  --danger-700: #59091a;
+  --danger-800: #2d040d;
+  --danger-900: #160207;
+
+  /* --------------------------------------------------------------------
+     NEUTRAL — the cool slate ramp used for surfaces + text
+     -------------------------------------------------------------------- */
+  --neutral-0:   #ffffff;
+  --neutral-25:  #f9f9fa;
+  --neutral-50:  #eff0f2;
+  --neutral-100: #dfe1e6;
+  --neutral-200: #bfc2cc;
+  --neutral-300: #9ea4b3;
+  --neutral-400: #656b7c;
+  --neutral-500: #454c5e;
+  --neutral-600: #383d4c;
+  --neutral-700: #2d313d;
+  --neutral-800: #20222a;   /* primary dark surface */
+  --neutral-900: #0f1014;
+
+  /* --------------------------------------------------------------------
+     GAMIFICATION — per-quiz / activity colors
+     -------------------------------------------------------------------- */
+  --gam-blaze:        #8158ec;   /* Blaze Quiz */
+  --gam-flash-poll:   #9b55c9;   /* Flash Poll */
+  --gam-certificate:  #6368db;   /* Certificate Quiz */
+  --gam-lesson:       #fa715f;   /* LessonQuiz */
+  --gam-case-study:   #2a90d8;   /* Case Study Quiz */
+  --gam-ai-grad: radial-gradient(circle at 50% 50%, #00cee6 0%, #8158ec 100%);
+
+  /* --------------------------------------------------------------------
+     SEMANTIC — light mode
+     -------------------------------------------------------------------- */
+  --bg-page:     var(--neutral-25);
+  --bg-surface:  var(--neutral-0);
+  --bg-muted:    var(--neutral-50);
+  --bg-inverse:  var(--neutral-800);
+
+  --fg-primary:   #262933; /* ink */
+  --fg-secondary: var(--neutral-500);
+  --fg-tertiary:  var(--neutral-400);
+  --fg-disabled:  var(--neutral-300);
+  --fg-on-dark:   var(--neutral-25);
+  --fg-on-brand:  var(--neutral-800);
+
+  --border-default: var(--neutral-100);
+  --border-strong:  var(--neutral-200);
+  --border-focus:   var(--primary-500);
+
+  --accent:         var(--primary-500);
+  --accent-hover:   var(--primary-600);
+  --accent-pressed: var(--primary-700);
+  --accent-soft:    var(--primary-100);
+
+  /* --------------------------------------------------------------------
+     RADIUS — pill-ish buttons, soft cards
+     -------------------------------------------------------------------- */
+  --radius-xs:  4px;
+  --radius-sm:  8px;
+  --radius-md:  12px;
+  --radius-lg:  16px;
+  --radius-xl:  20px;
+  --radius-pill: 9999px;
+
+  /* --------------------------------------------------------------------
+     SHADOW — three-tier (from Figma)
+     -------------------------------------------------------------------- */
+  --shadow-s:  -1px -1px 4px 0 rgba(32,34,42,0.06),  1px 1px 4px 0 rgba(32,34,42,0.06);
+  --shadow-l:   4px  4px 24px 0 rgba(32,34,42,0.12);
+  --shadow-xl:  0    4px 32px 0 rgba(32,34,42,0.24);
+
+  /* --------------------------------------------------------------------
+     SPACING — 4-base scale
+     -------------------------------------------------------------------- */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  20px;
+  --sp-6:  24px;
+  --sp-8:  32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-14: 56px;
+  --sp-16: 64px;
+  --sp-18: 72px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+  --sp-40: 160px;
+
+  /* --------------------------------------------------------------------
+     TYPE — base families, weights, sizes
+     -------------------------------------------------------------------- */
+  --font-sans:    "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Anton", "Harabara Mais Demo", var(--font-sans);
+  --font-mono:    "Roboto Mono", ui-monospace, Menlo, monospace;
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-bold:    700;
+
+  --fs-display:   48px;  /* 3rem   */
+  --fs-h1:        32px;  /* 2rem   */
+  --fs-h2:        24px;
+  --fs-h3:        20px;
+  --fs-h4:        16px;
+  --fs-h5:        14px;
+  --fs-h6:        12px;
+
+  --fs-body-l:    16px;
+  --fs-body-m:    14px;
+  --fs-body-s:    12px;
+  --fs-caption:   10px;
+
+  --lh-tight:     1.2;    /* 120% - small text, H6 */
+  --lh-snug:      1.4;    /* 140% */
+  --lh-normal:    1.5;    /* 150% - headings & body */
+
+  /* Transitions */
+  --motion-fast:   120ms cubic-bezier(0.2, 0, 0, 1);
+  --motion-normal: 200ms cubic-bezier(0.2, 0, 0, 1);
+  --motion-slow:   320ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* ---------- Dark surface overrides (used by Admin + App chrome) ----- */
+[data-theme="dark"] {
+  --bg-page:     var(--neutral-800);
+  --bg-surface:  var(--neutral-700);
+  --bg-muted:    #262933;
+  --bg-inverse:  var(--neutral-25);
+
+  --fg-primary:   var(--neutral-25);
+  --fg-secondary: var(--neutral-200);
+  --fg-tertiary:  var(--neutral-300);
+  --fg-disabled:  var(--neutral-500);
+
+  --border-default: var(--neutral-600);
+  --border-strong:  var(--neutral-500);
+}
+
+/* ==========================================================================
+   SEMANTIC ELEMENT STYLES
+   ========================================================================== */
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body-m);
+  line-height: var(--lh-normal);
+  color: var(--fg-primary);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-normal);
+  color: var(--fg-primary);
+}
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+h4 { font-size: var(--fs-h4); }
+h5 { font-size: var(--fs-h5); }
+h6 { font-size: var(--fs-h6); line-height: var(--lh-snug); }
+
+p { margin: 0; font-size: var(--fs-body-m); line-height: var(--lh-normal); }
+
+code, pre {
+  font-family: var(--font-mono);
+  font-size: var(--fs-body-s);
+}
+
+/* Display / hero text (used sparingly) */
+.display {
+  font-family: var(--font-sans);
+  font-weight: var(--fw-bold);
+  font-size: var(--fs-display);
+  line-height: var(--lh-normal);
+  letter-spacing: -0.01em;
+}
+
+/* Button type */
+.btn-label-l { font-size: 16px; font-weight: 700; line-height: 1.5; }
+.btn-label-m { font-size: 14px; font-weight: 700; line-height: 1.5; }
+.btn-label-s { font-size: 12px; font-weight: 700; line-height: 1.4; }

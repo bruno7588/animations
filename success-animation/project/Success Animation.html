@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Success animation — 5Mins</title>
+<link rel="stylesheet" href="colors_and_type.css" />
+<style>
+  html, body {
+    height: 100%;
+  }
+    body {
+    margin: 0;
+    background: #e9ebef;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    font-family: var(--font-sans);
+  }
+
+  /* ----------- Phone frame ----------- */
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: #20222a;
+    border-radius: 36px;
+    border: 10px solid #1a1c22;
+    box-shadow:
+      0 30px 80px rgba(20, 22, 30, 0.35),
+      0 8px 20px rgba(20, 22, 30, 0.18);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    isolation: isolate;
+  }
+
+  /* Status bar */
+  .status-bar {
+    height: 28px;
+    background: #f3f4f6;
+    color: #20222a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .status-bar .right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #20222a;
+  }
+  .status-bar .battery {
+    border: 1px solid #20222a;
+    border-radius: 3px;
+    padding: 1px 3px;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  /* Browser chrome */
+  .browser-chrome {
+    height: 48px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    flex-shrink: 0;
+  }
+  .browser-chrome .icon-btn {
+    width: 28px; height: 28px;
+    display: grid; place-items: center;
+    color: #20222a;
+    flex-shrink: 0;
+  }
+  .browser-chrome .icon-btn svg { width: 20px; height: 20px; }
+  .browser-chrome .url-pill {
+    flex: 1;
+    height: 32px;
+    background: #e3e5ea;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+    font-size: 13px;
+    color: #20222a;
+    font-weight: 500;
+  }
+  .browser-chrome .lock { width: 14px; height: 14px; }
+  .browser-chrome .tabs-btn {
+    width: 26px; height: 26px;
+    border: 1.6px solid #20222a;
+    border-radius: 5px;
+    display: grid; place-items: center;
+    font-size: 12px; font-weight: 700;
+    color: #20222a;
+  }
+  .browser-chrome .menu-dot {
+    position: relative;
+    width: 24px; height: 24px;
+    display: grid; place-items: center;
+  }
+  .browser-chrome .menu-dot::after {
+    content: "";
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 6px; height: 6px;
+    background: #00cee6; border-radius: 50%;
+  }
+
+  /* App canvas (dark) */
+  .app-canvas {
+    flex: 1;
+    background: #20222a;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Stage replaces the centered grid — sits inside phone */
+  .stage {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 160px;
+    position: relative;
+    isolation: isolate;
+  }
+
+  /* Confetti layer — INSIDE the phone canvas, clipped to it.
+     Sits ABOVE the tick + copy so pieces fly in front of them. */
+  .confetti-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 3;
+  }
+
+  /* Center column — circle + text */
+  .center {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    z-index: 1;
+  }
+
+  /* ----------- Badge (Figma tick) ----------- */
+  .badge {
+    --size: 104px;
+    width: var(--size);
+    height: var(--size);
+    position: relative;
+    /* Hidden initially; JS removes this once it takes over the animation. */
+    visibility: hidden;
+    will-change: transform;
+    transform-origin: center;
+    backface-visibility: hidden;
+  }
+  .badge svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    /* Avoid sub-pixel SVG flicker during scale() */
+    transform: translateZ(0);
+  }
+
+  /* Tick stroke draw — starts hidden; JS animates the dashoffset */
+  .tick-path {
+    stroke-dasharray: 60;
+    stroke-dashoffset: 60;
+  }
+
+  /* ----------- Text ----------- */
+  .copy {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 300px;
+    padding: 0 16px;
+  }
+  .copy h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .copy p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.7);
+    line-height: 1.45;
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .copy.in h1 { animation: textRise 480ms 240ms cubic-bezier(.2, 0, 0, 1) forwards; }
+  .copy.in p  { animation: textRise 480ms 360ms cubic-bezier(.2, 0, 0, 1) forwards; }
+
+  @keyframes textRise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ----------- Replay ---------- */
+  .replay {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--fg-primary);
+    background: var(--neutral-0);
+    border: 1px solid var(--border-default);
+    box-shadow: var(--shadow-s);
+    cursor: pointer;
+    transition: transform var(--motion-fast), background var(--motion-fast);
+  }
+  .replay:hover { background: var(--neutral-25); }
+  .replay:active { transform: scale(.98); }
+  .replay svg { width: 16px; height: 16px; }
+
+  /* ----------- Confetti piece (positioned by JS) ----------- */
+  .confetti {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: center;
+    will-change: transform, opacity;
+    opacity: 0;
+  }
+  .confetti.square    { border-radius: 1px; }
+  .confetti.circle    { border-radius: 50%; }
+  .confetti.triangle  { width: 0; height: 0; background: transparent !important; border-style: solid; }
+  .confetti.arc svg   { width: 100%; height: 100%; overflow: visible; display: block; }
+</style>
+</head>
+<body>
+
+  <div class="phone">
+    <!-- OS status bar -->
+    <div class="status-bar">
+      <span>07:37</span>
+      <div class="right">
+        <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor" aria-hidden="true"><path d="M7 0a7 7 0 0 0-4.95 2.05L7 7l4.95-4.95A7 7 0 0 0 7 0Z"/></svg>
+        <svg width="16" height="10" viewBox="0 0 16 10" fill="currentColor" aria-hidden="true"><rect x="0" y="6" width="3" height="4"/><rect x="4" y="4" width="3" height="6"/><rect x="8" y="2" width="3" height="8"/><rect x="12" y="0" width="3" height="10"/></svg>
+        <span class="battery">59</span>
+      </div>
+    </div>
+
+    <!-- Browser chrome -->
+    <div class="browser-chrome">
+      <div class="icon-btn" aria-label="home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
+      </div>
+      <div class="url-pill">
+        <svg class="lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        <span>app.5mins.ai</span>
+      </div>
+      <div class="tabs-btn">2</div>
+      <div class="menu-dot">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>
+      </div>
+    </div>
+
+    <!-- App canvas (dark) -->
+    <div class="app-canvas">
+      <div class="stage" id="stage">
+        <div class="confetti-layer" id="confetti"></div>
+        <div class="center">
+          <div class="badge" id="badge">
+            <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <!-- Outer dark green disc (offset baseline) -->
+              <path d="M35.959 69.7246C54.5986 69.7246 69.709 54.6142 69.709 35.9746C69.709 17.335 54.5986 2.22461 35.959 2.22461C17.3194 2.22461 2.20898 17.335 2.20898 35.9746C2.20898 54.6142 17.3194 69.7246 35.959 69.7246Z" fill="var(--success-600)" class="badge-back" />
+              <!-- Front bright green disc, slightly offset for depth -->
+              <path d="M33.7652 67.0246C51.1933 67.0246 65.3215 52.8964 65.3215 35.4684C65.3215 18.0403 51.1933 3.91211 33.7652 3.91211C16.3372 3.91211 2.20898 18.0403 2.20898 35.4684C2.20898 52.8964 16.3372 67.0246 33.7652 67.0246Z" fill="var(--success-500)" class="badge-front" />
+              <!-- Soft highlight stroke top-left -->
+              <path d="M13.48 16.7094C16.0112 12.7156 21.4112 9.39687 27.0362 8.38437C28.4425 8.15937 29.8487 8.04688 31.03 8.49688C31.93 8.83438 32.6612 9.67812 32.155 10.6344C31.7612 11.4219 30.6925 11.7594 29.8487 12.0406C24.5725 13.7844 20.0219 17.2212 16.9112 21.8281C15.7862 23.5156 14.0987 28.1844 12.0175 27.0031C9.82374 25.7094 10.2737 21.6594 13.48 16.7094Z" fill="var(--success-300)" class="badge-shine" />
+              <!-- Tick stroke -->
+              <path class="tick-path" d="M23.25 36.0056L31.74 44.4956L48.75 27.5156" stroke="#20222A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="copy" id="copy">
+            <h1>You're in!</h1>
+            <p>We'll get you set up in the &lt;company name&gt; account</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="replay" id="replay" type="button" aria-label="Replay animation">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 3-6.7" />
+      <path d="M3 4v5h5" />
+    </svg>
+    Replay
+  </button>
+
+  <!-- Tweaks defaults — host rewrites this block on disk -->
+  <script id="tweaks-defaults" type="application/json">
+  {
+    "headline": "You're in!",
+    "subline": "We'll get you set up in the <company name> account",
+    "circleColor": "#18A957",
+    "confettiCount": 69,
+    "confettiSpread": 1.2,
+    "tickDuration": 200,
+    "tickEasing": "bounce",
+    "autoplay": true
+  }
+  </script>
+
+  <script>
+    // ---- Tweaks state (persisted between sessions via host postMessage) ----
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "headline": "You're in!",
+      "subline": "We'll get you set up in the \u003ccompany name> account",
+      "circleColor": "#18A957",
+      "confettiCount": 72,
+      "confettiSpread": 1.4,
+      "tickDuration": 500,
+      "tickEasing": "bounce",
+      "autoplay": true
+    }/*EDITMODE-END*/;
+
+    let state = { ...TWEAK_DEFAULTS };
+
+    // Easing curve presets — picked by tickEasing tweak
+    const TICK_EASINGS = {
+      bounce:    'cubic-bezier(0.34, 1.56, 0.64, 1)',  // overshoot — default
+      easeOut:   'cubic-bezier(0.16, 1,    0.3,  1)',
+      easeInOut: 'cubic-bezier(0.65, 0,    0.35, 1)',
+      linear:    'linear',
+      snappy:    'cubic-bezier(0.5,  1.5,  0.5,  1)',
+      smooth:    'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+    };
+
+    // Confetti palette — saturated party colors against dark canvas
+    const CONFETTI_COLORS = [
+      "#FFB627", // amber/yellow
+      "#FF6B8B", // pink
+      "#E63462", // crimson
+      "#3FA7FF", // sky blue
+      "#22D3DD", // cyan
+      "#19C37D", // green
+      "#9B5DE5", // purple
+      "#3F3D8E", // indigo
+      "#FF8A3D"  // orange
+    ];
+
+    const stage     = document.getElementById('stage');
+    const confettiEl = document.getElementById('confetti');
+    const badge     = document.getElementById('badge');
+    const copy      = document.getElementById('copy');
+    const replay    = document.getElementById('replay');
+
+    function applyState() {
+      // Copy
+      copy.querySelector('h1').textContent = state.headline;
+      copy.querySelector('p').textContent  = state.subline;
+      // Color — derive a darker shade and a lighter highlight from the chosen hue
+      const hsl = hexToHsl(state.circleColor);
+      const front = hslToCss(hsl.h, hsl.s, hsl.l);
+      const back  = hslToCss(hsl.h, hsl.s, Math.max(0,  hsl.l - 13));
+      const shine = hslToCss(hsl.h, Math.max(20, hsl.s - 20), Math.min(95, hsl.l + 28));
+      badge.style.setProperty('--success-500', front);
+      badge.style.setProperty('--success-600', back);
+      badge.style.setProperty('--success-300', shine);
+    }
+
+    function hexToHsl(hex) {
+      const h = hex.replace('#','');
+      const n = h.length === 3 ? h.split('').map(c => c+c).join('') : h;
+      let r = parseInt(n.slice(0,2),16) / 255;
+      let g = parseInt(n.slice(2,4),16) / 255;
+      let b = parseInt(n.slice(4,6),16) / 255;
+      const max = Math.max(r,g,b), min = Math.min(r,g,b);
+      let H = 0, S = 0, L = (max + min) / 2;
+      if (max !== min) {
+        const d = max - min;
+        S = L > .5 ? d / (2 - max - min) : d / (max + min);
+        switch(max) {
+          case r: H = (g - b) / d + (g < b ? 6 : 0); break;
+          case g: H = (b - r) / d + 2; break;
+          case b: H = (r - g) / d + 4; break;
+        }
+        H *= 60;
+      }
+      return { h: H, s: S * 100, l: L * 100 };
+    }
+    function hslToCss(h, s, l) {
+      return `hsl(${h.toFixed(1)} ${s.toFixed(1)}% ${l.toFixed(1)}%)`;
+    }
+
+    // -------- Confetti (burst outwards from the tick) --------
+    // Returns the longest end-time (delay + duration) across all pieces so
+    // callers can sync other animations (e.g. the progress bar) to it.
+    function spawnConfetti() {
+      confettiEl.innerHTML = '';
+      const n = Math.max(0, Math.round(state.confettiCount));
+      const spread = state.confettiSpread;
+      let maxEnd = 0;
+
+      // Origin = center of the badge, in confetti-layer coordinates
+      const layerRect = confettiEl.getBoundingClientRect();
+      const badgeRect = badge.getBoundingClientRect();
+      const originX = badgeRect.left - layerRect.left + badgeRect.width  / 2;
+      const originY = badgeRect.top  - layerRect.top  + badgeRect.height / 2;
+      const layerHeight = layerRect.height;
+
+      for (let i = 0; i < n; i++) {
+        const piece = document.createElement('span');
+        const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+
+        // Pick a shape — weighted mix matching the reference
+        const r = Math.random();
+        let kind;
+        if      (r < 0.28) kind = 'square';
+        else if (r < 0.52) kind = 'circle';
+        else if (r < 0.72) kind = 'triangle';
+        else               kind = 'arc';
+
+        piece.className = 'confetti ' + kind;
+
+        if (kind === 'square') {
+          const s = 6 + Math.random() * 14; // 6–20
+          piece.style.width  = s + 'px';
+          piece.style.height = s + 'px';
+          piece.style.background = color;
+        } else if (kind === 'circle') {
+          const s = 4 + Math.random() * 14;
+          piece.style.width  = s + 'px';
+          piece.style.height = s + 'px';
+          piece.style.background = color;
+        } else if (kind === 'triangle') {
+          const w = 6 + Math.random() * 14;
+          const h = w * (0.9 + Math.random() * 0.4);
+          piece.style.borderLeftWidth   = (w/2) + 'px';
+          piece.style.borderRightWidth  = (w/2) + 'px';
+          piece.style.borderBottomWidth = h + 'px';
+          piece.style.borderTopWidth    = '0';
+          piece.style.borderLeftColor   = 'transparent';
+          piece.style.borderRightColor  = 'transparent';
+          piece.style.borderBottomColor = color;
+          piece.style.borderTopColor    = 'transparent';
+        } else { // arc — a curved streamer like the reference
+          const w = 24 + Math.random() * 40; // arc bounding box
+          const h = 24 + Math.random() * 40;
+          const stroke = 3 + Math.random() * 2;
+          piece.style.width  = w + 'px';
+          piece.style.height = h + 'px';
+          // Random arc sweep
+          const sx = 2, sy = h * (0.3 + Math.random()*0.4);
+          const ex = w - 2, ey = h * (0.3 + Math.random()*0.4);
+          const cx = w / 2 + (Math.random()-0.5)*w*0.4;
+          const cy = -h * (0.2 + Math.random()*0.6); // pull control point up to make a curve
+          piece.innerHTML = `<svg viewBox="0 0 ${w} ${h}" fill="none"><path d="M${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"/></svg>`;
+        }
+
+        // Radial burst direction (full 360°)
+        const angle = Math.random() * Math.PI * 2;
+        const dist = (90 + Math.random() * 160) * spread;
+        const burstX = Math.cos(angle) * dist;
+        const burstY = Math.sin(angle) * dist;
+
+        // Final fall position — guarantee the piece exits below the canvas.
+        // Compute the Y the piece reaches at burst peak, then add enough
+        // gravity to push it past the bottom edge with margin.
+        const peakY = originY + burstY;
+        const fallTargetY = layerHeight + 80 + Math.random() * 60;
+        const gravity = Math.max(160, fallTargetY - peakY);
+        // Slight horizontal drift over the fall — gentle, varied per piece
+        const drift  = (Math.random() - 0.5) * 100;
+
+        const rotStart = (Math.random() * 360) | 0;
+        // Slower, more graceful spin during the fall
+        const rotEnd   = rotStart + 180 + Math.random() * 360;
+
+        // Two-phase timing: quick outward burst, then a longer fall under gravity.
+        const burstDur = 320 + Math.random() * 140;   // ~0.32–0.46s outward pop
+        const fallDur  = 1600 + Math.random() * 900;  // ~1.6–2.5s downward
+        const duration = burstDur + fallDur;
+        const burstFrac = burstDur / duration;        // offset where burst ends
+        const delay    = Math.random() * 100;
+
+        // Center each piece on its origin point
+        const offsetTransform = `translate(-50%, -50%)`;
+
+        piece.animate(
+          [
+            // Spawn at origin, hidden
+            { transform: `translate(${originX}px, ${originY}px) ${offsetTransform} rotate(${rotStart}deg) scale(.4)`,
+              opacity: 0,
+              offset: 0,
+              // Quick decelerating burst out to the peak
+              easing: 'cubic-bezier(.16, .8, .3, 1)' },
+
+            // Burst peak — gravity takes over immediately from here, no hang time
+            { transform: `translate(${originX + burstX}px, ${peakY}px) ${offsetTransform} rotate(${rotStart + 60}deg) scale(1)`,
+              opacity: 1,
+              offset: burstFrac,
+              // ease-in: starts slow at the peak and accelerates downward (gravity)
+              easing: 'cubic-bezier(.5, 0, .85, .3)' },
+
+            // Land well below the canvas, still accelerating
+            { transform: `translate(${originX + burstX + drift}px, ${peakY + gravity}px) ${offsetTransform} rotate(${rotEnd}deg) scale(1)`,
+              opacity: 1,
+              offset: 1 }
+          ],
+          {
+            duration,
+            delay,
+            // Per-keyframe easings above drive the feel; keep this linear so they apply cleanly.
+            easing: 'linear',
+            fill: 'forwards'
+          }
+        );
+
+        confettiEl.appendChild(piece);
+        if (delay + duration > maxEnd) maxEnd = delay + duration;
+      }
+      return maxEnd;
+    }
+
+    // -------- Play sequence --------
+    let playing = false;
+    function play() {
+      if (playing) return;
+      playing = true;
+
+      // Reset
+      [badge, copy].forEach(el => el.classList.remove('in'));
+      // Force reflow so animations restart
+      void stage.offsetWidth;
+
+
+      // Drive the badge pop and tick draw via WAAPI so they pick up the
+      // current tickDuration / tickEasing tweaks.
+      const dur    = Math.max(60, +state.tickDuration || 200);
+      const easing = TICK_EASINGS[state.tickEasing] || TICK_EASINGS.bounce;
+
+      const tickPath = badge.querySelector('.tick-path');
+      // Cancel any in-flight animations.
+      badge.getAnimations().forEach(a => a.cancel());
+      tickPath.getAnimations().forEach(a => a.cancel());
+      // Make sure no stale inline values fight WAAPI's keyframes.
+      badge.style.transform = '';
+      tickPath.style.strokeDashoffset = '';
+      badge.style.visibility = 'visible';
+
+      const badgeAnim = badge.animate(
+        [{ transform: 'scale(0)' }, { transform: 'scale(1)' }],
+        { duration: dur, easing, fill: 'both' }
+      );
+      // Bake the final transform into inline style on finish so the
+      // animation effect can be cleared without snapping back to scale(0).
+      badgeAnim.addEventListener('finish', () => {
+        try { badgeAnim.commitStyles(); badgeAnim.cancel(); } catch (e) {
+          badge.style.transform = 'scale(1)';
+        }
+      });
+
+      const tickDelay = Math.round(dur * 0.7);
+      const tickDur   = Math.max(80, Math.min(dur, 420));
+      const tickAnim = tickPath.animate(
+        [{ strokeDashoffset: 60 }, { strokeDashoffset: 0 }],
+        { duration: tickDur, delay: tickDelay, easing, fill: 'both' }
+      );
+      tickAnim.addEventListener('finish', () => {
+        try { tickAnim.commitStyles(); tickAnim.cancel(); } catch (e) {
+          tickPath.style.strokeDashoffset = '0';
+        }
+      });
+
+      copy.classList.add('in');
+      const confettiTotal = spawnConfetti();
+
+      const total = Math.max(dur + tickDelay + tickDur + 200, confettiTotal);
+      setTimeout(() => { playing = false; }, total);
+    }
+
+    replay.addEventListener('click', play);
+
+    // ---- Tweaks panel wiring (host protocol) ----
+    let panelOpen = false;
+    let panelEl = null;
+
+    function buildPanel() {
+      const root = document.createElement('div');
+      root.id = 'tweaks-panel';
+      root.style.cssText = `
+        position: fixed; right: 24px; top: 24px; z-index: 50;
+        width: 280px; padding: 16px;
+        background: #fff; border-radius: 12px;
+        box-shadow: 4px 4px 24px 0 rgba(32,34,42,0.12);
+        font-family: var(--font-sans); color: var(--fg-primary);
+        display: flex; flex-direction: column; gap: 14px;
+      `;
+      root.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-weight:700;font-size:14px;">Tweaks</div>
+          <button id="tw-close" style="background:none;border:0;cursor:pointer;color:var(--fg-tertiary);font-size:18px;line-height:1;">×</button>
+        </div>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg-secondary);">
+          Headline
+          <input id="tw-headline" type="text" style="padding:8px 10px;border:1px solid var(--border-default);border-radius:8px;font:inherit;color:var(--fg-primary);" />
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg-secondary);">
+          Subline
+          <textarea id="tw-subline" rows="2" style="padding:8px 10px;border:1px solid var(--border-default);border-radius:8px;font:inherit;color:var(--fg-primary);resize:vertical;"></textarea>
+        </label>
+
+        <label style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--fg-secondary);">
+          Circle color
+          <input id="tw-color" type="color" style="width:40px;height:28px;border:1px solid var(--border-default);border-radius:6px;background:none;cursor:pointer;" />
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg-secondary);">
+          <span style="display:flex;justify-content:space-between;"><span>Confetti count</span><span id="tw-count-val">36</span></span>
+          <input id="tw-count" type="range" min="0" max="120" step="1" />
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg-secondary);">
+          <span style="display:flex;justify-content:space-between;"><span>Spread</span><span id="tw-spread-val">1.0×</span></span>
+          <input id="tw-spread" type="range" min="0.4" max="1.8" step="0.05" />
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg-secondary);">
+          <span style="display:flex;justify-content:space-between;"><span>Tick duration</span><span id="tw-tickdur-val">200ms</span></span>
+          <input id="tw-tickdur" type="range" min="60" max="1200" step="20" />
+        </label>
+
+        <label style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--fg-secondary);">
+          Tick easing
+          <select id="tw-tickease" style="padding:8px 10px;border:1px solid var(--border-default);border-radius:8px;font:inherit;color:var(--fg-primary);background:#fff;">
+            <option value="bounce">Bounce (overshoot)</option>
+            <option value="easeOut">Ease out</option>
+            <option value="easeInOut">Ease in-out</option>
+            <option value="snappy">Snappy</option>
+            <option value="smooth">Smooth</option>
+            <option value="linear">Linear</option>
+          </select>
+        </label>
+
+        <button id="tw-replay" style="margin-top:4px;padding:10px;border:0;border-radius:8px;background:var(--primary-500);color:#fff;font-weight:700;font:inherit;cursor:pointer;">
+          Replay animation
+        </button>
+      `;
+      return root;
+    }
+
+    function openPanel() {
+      if (panelOpen) return;
+      panelEl = buildPanel();
+      document.body.appendChild(panelEl);
+      panelOpen = true;
+
+      const $ = (id) => panelEl.querySelector(id);
+      $('#tw-headline').value = state.headline;
+      $('#tw-subline').value  = state.subline;
+      $('#tw-color').value    = state.circleColor;
+      $('#tw-count').value    = state.confettiCount;
+      $('#tw-spread').value   = state.confettiSpread;
+      $('#tw-tickdur').value  = state.tickDuration;
+      $('#tw-tickease').value = state.tickEasing;
+      $('#tw-count-val').textContent  = state.confettiCount;
+      $('#tw-spread-val').textContent = (+state.confettiSpread).toFixed(2) + '×';
+      $('#tw-tickdur-val').textContent = state.tickDuration + 'ms';
+
+      const persist = (edits) => {
+        Object.assign(state, edits);
+        applyState();
+        try {
+          window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+        } catch(e) {}
+      };
+
+      $('#tw-headline').addEventListener('input', e => persist({ headline: e.target.value }));
+      $('#tw-subline').addEventListener('input',  e => persist({ subline: e.target.value }));
+      $('#tw-color').addEventListener('input',    e => persist({ circleColor: e.target.value }));
+      $('#tw-count').addEventListener('input',    e => {
+        const v = +e.target.value;
+        $('#tw-count-val').textContent = v;
+        persist({ confettiCount: v });
+      });
+      $('#tw-spread').addEventListener('input',   e => {
+        const v = +e.target.value;
+        $('#tw-spread-val').textContent = v.toFixed(2) + '×';
+        persist({ confettiSpread: v });
+      });
+      $('#tw-tickdur').addEventListener('input', e => {
+        const v = +e.target.value;
+        $('#tw-tickdur-val').textContent = v + 'ms';
+        persist({ tickDuration: v });
+      });
+      $('#tw-tickease').addEventListener('change', e => {
+        persist({ tickEasing: e.target.value });
+      });
+      $('#tw-replay').addEventListener('click', play);
+      $('#tw-close').addEventListener('click', () => {
+        closePanel();
+        try { window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); } catch(e) {}
+      });
+    }
+
+    function closePanel() {
+      if (!panelOpen || !panelEl) return;
+      panelEl.remove();
+      panelEl = null;
+      panelOpen = false;
+    }
+
+    window.addEventListener('message', (e) => {
+      const data = e.data || {};
+      if (data.type === '__activate_edit_mode') openPanel();
+      if (data.type === '__deactivate_edit_mode') closePanel();
+    });
+
+    // Announce tweak availability
+    try {
+      window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    } catch(e) {}
+
+    // -------- Boot --------
+    applyState();
+    if (state.autoplay) {
+      // Small delay so fonts settle
+      setTimeout(play, 200);
+    }
+  </script>
+</body>
+</html>

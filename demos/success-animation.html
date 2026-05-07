@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Success animation · Animations sandbox</title>
+  <link rel="stylesheet" href="/styles/page.css">
+  <style>
+    /* Dark canvas — mimics the in-app screen the animation ships into */
+    .success-canvas {
+      width: 320px;
+      height: 480px;
+      background: #20222a;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 100px;
+      isolation: isolate;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .confetti-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 3;
+    }
+
+    .center {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      z-index: 1;
+    }
+
+    .success-canvas .copy {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 280px;
+      padding: 0 16px;
+    }
+    .success-canvas .copy h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .success-canvas .copy p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    /* === Animation under test — copy this block to ship === */
+    .badge {
+      width: 104px;
+      height: 104px;
+      transform: scale(0);
+      transform-origin: center;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+    .badge svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      transform: translateZ(0);
+    }
+    .tick-path {
+      stroke-dasharray: 60;
+      stroke-dashoffset: 60;
+    }
+    .copy h1, .copy p {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .success-canvas.playing .badge {
+      animation: badge-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .success-canvas.playing .tick-path {
+      animation: tick-draw 420ms 350ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    .success-canvas.playing .copy h1 {
+      animation: text-rise 480ms 240ms cubic-bezier(.2, 0, 0, 1) forwards;
+    }
+    .success-canvas.playing .copy p {
+      animation: text-rise 480ms 360ms cubic-bezier(.2, 0, 0, 1) forwards;
+    }
+
+    @keyframes badge-pop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+    @keyframes tick-draw {
+      from { stroke-dashoffset: 60; }
+      to   { stroke-dashoffset: 0; }
+    }
+    @keyframes text-rise {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* === end copy block === */
+
+    /* Confetti pieces — positioned & animated by JS via WAAPI */
+    .confetti {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform-origin: center;
+      will-change: transform, opacity;
+      opacity: 0;
+    }
+    .confetti.square   { border-radius: 1px; }
+    .confetti.circle   { border-radius: 50%; }
+    .confetti.triangle { width: 0; height: 0; background: transparent !important; border-style: solid; }
+    .confetti.arc svg  { width: 100%; height: 100%; overflow: visible; display: block; }
+  </style>
+</head>
+<body>
+  <main class="page demo">
+    <a class="demo-back" href="/">← All animations</a>
+    <h1>Success animation</h1>
+    <p class="lede">Badge pop · tick draw · text rise · confetti burst</p>
+
+    <div class="demo-stage">
+      <div class="success-canvas" id="canvas">
+        <div class="confetti-layer" id="confetti"></div>
+        <div class="center">
+          <div class="badge" id="badge">
+            <svg viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M35.959 69.7246C54.5986 69.7246 69.709 54.6142 69.709 35.9746C69.709 17.335 54.5986 2.22461 35.959 2.22461C17.3194 2.22461 2.20898 17.335 2.20898 35.9746C2.20898 54.6142 17.3194 69.7246 35.959 69.7246Z" fill="#11763d" />
+              <path d="M33.7652 67.0246C51.1933 67.0246 65.3215 52.8964 65.3215 35.4684C65.3215 18.0403 51.1933 3.91211 33.7652 3.91211C16.3372 3.91211 2.20898 18.0403 2.20898 35.4684C2.20898 52.8964 16.3372 67.0246 33.7652 67.0246Z" fill="#18a957" />
+              <path d="M13.48 16.7094C16.0112 12.7156 21.4112 9.39687 27.0362 8.38437C28.4425 8.15937 29.8487 8.04688 31.03 8.49688C31.93 8.83438 32.6612 9.67812 32.155 10.6344C31.7612 11.4219 30.6925 11.7594 29.8487 12.0406C24.5725 13.7844 20.0219 17.2212 16.9112 21.8281C15.7862 23.5156 14.0987 28.1844 12.0175 27.0031C9.82374 25.7094 10.2737 21.6594 13.48 16.7094Z" fill="#a3ddbc" />
+              <path class="tick-path" d="M23.25 36.0056L31.74 44.4956L48.75 27.5156" stroke="#20222A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+          <div class="copy" id="copy">
+            <h1>You're in!</h1>
+            <p>We'll get you set up in the &lt;company name&gt; account</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="demo-replay" id="replay">Replay</button>
+
+    <pre class="demo-source"><code>.badge      { animation: badge-pop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.tick-path  {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: tick-draw 420ms 350ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.copy h1    { animation: text-rise 480ms 240ms cubic-bezier(.2, 0, 0, 1) forwards; }
+.copy p     { animation: text-rise 480ms 360ms cubic-bezier(.2, 0, 0, 1) forwards; }
+
+@keyframes badge-pop { from { transform: scale(0); }    to { transform: scale(1); } }
+@keyframes tick-draw { from { stroke-dashoffset: 60; }  to { stroke-dashoffset: 0; } }
+@keyframes text-rise { to   { opacity: 1; transform: translateY(0); } }
+
+/* Confetti — JS spawns 72 pieces (squares, circles, triangles, arc streamers)
+   that burst from the badge center, then fall under gravity. See script. */</code></pre>
+  </main>
+
+  <script>
+    // Saturated party palette against the dark canvas
+    const CONFETTI_COLORS = [
+      "#FFB627", "#FF6B8B", "#E63462", "#3FA7FF",
+      "#22D3DD", "#19C37D", "#9B5DE5", "#3F3D8E", "#FF8A3D"
+    ];
+    const CONFETTI_COUNT  = 72;
+    const CONFETTI_SPREAD = 1.4;
+
+    const canvas    = document.getElementById('canvas');
+    const confettiEl = document.getElementById('confetti');
+    const badge     = document.getElementById('badge');
+    const replay    = document.getElementById('replay');
+
+    function spawnConfetti() {
+      confettiEl.innerHTML = '';
+
+      // Origin = badge center, in confetti-layer coordinates.
+      // getBoundingClientRect works even when badge is at scale(0): it returns
+      // a 0×0 box centered on the layout center, which is exactly the origin.
+      const layerRect = confettiEl.getBoundingClientRect();
+      const badgeRect = badge.getBoundingClientRect();
+      const originX = badgeRect.left - layerRect.left + badgeRect.width  / 2;
+      const originY = badgeRect.top  - layerRect.top  + badgeRect.height / 2;
+      const layerHeight = layerRect.height;
+
+      for (let i = 0; i < CONFETTI_COUNT; i++) {
+        const piece = document.createElement('span');
+        const color = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+
+        // Weighted shape mix
+        const r = Math.random();
+        let kind;
+        if      (r < 0.28) kind = 'square';
+        else if (r < 0.52) kind = 'circle';
+        else if (r < 0.72) kind = 'triangle';
+        else               kind = 'arc';
+
+        piece.className = 'confetti ' + kind;
+
+        if (kind === 'square') {
+          const s = 6 + Math.random() * 14;
+          piece.style.width  = s + 'px';
+          piece.style.height = s + 'px';
+          piece.style.background = color;
+        } else if (kind === 'circle') {
+          const s = 4 + Math.random() * 14;
+          piece.style.width  = s + 'px';
+          piece.style.height = s + 'px';
+          piece.style.background = color;
+        } else if (kind === 'triangle') {
+          const w = 6 + Math.random() * 14;
+          const h = w * (0.9 + Math.random() * 0.4);
+          piece.style.borderLeftWidth   = (w/2) + 'px';
+          piece.style.borderRightWidth  = (w/2) + 'px';
+          piece.style.borderBottomWidth = h + 'px';
+          piece.style.borderTopWidth    = '0';
+          piece.style.borderLeftColor   = 'transparent';
+          piece.style.borderRightColor  = 'transparent';
+          piece.style.borderBottomColor = color;
+          piece.style.borderTopColor    = 'transparent';
+        } else {
+          const w = 24 + Math.random() * 40;
+          const h = 24 + Math.random() * 40;
+          const stroke = 3 + Math.random() * 2;
+          piece.style.width  = w + 'px';
+          piece.style.height = h + 'px';
+          const sx = 2, sy = h * (0.3 + Math.random()*0.4);
+          const ex = w - 2, ey = h * (0.3 + Math.random()*0.4);
+          const cx = w / 2 + (Math.random()-0.5) * w * 0.4;
+          const cy = -h * (0.2 + Math.random() * 0.6);
+          piece.innerHTML = `<svg viewBox="0 0 ${w} ${h}" fill="none"><path d="M${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"/></svg>`;
+        }
+
+        // Radial burst — full 360°
+        const angle  = Math.random() * Math.PI * 2;
+        const dist   = (90 + Math.random() * 160) * CONFETTI_SPREAD;
+        const burstX = Math.cos(angle) * dist;
+        const burstY = Math.sin(angle) * dist;
+
+        // Fall past the canvas bottom edge with margin
+        const peakY       = originY + burstY;
+        const fallTargetY = layerHeight + 80 + Math.random() * 60;
+        const gravity     = Math.max(160, fallTargetY - peakY);
+        const drift       = (Math.random() - 0.5) * 100;
+
+        const rotStart = (Math.random() * 360) | 0;
+        const rotEnd   = rotStart + 180 + Math.random() * 360;
+
+        // Two-phase: quick outward burst, longer accelerating fall
+        const burstDur  = 320 + Math.random() * 140;
+        const fallDur   = 1600 + Math.random() * 900;
+        const duration  = burstDur + fallDur;
+        const burstFrac = burstDur / duration;
+        const delay     = Math.random() * 100;
+
+        const offsetTransform = 'translate(-50%, -50%)';
+
+        piece.animate(
+          [
+            { transform: `translate(${originX}px, ${originY}px) ${offsetTransform} rotate(${rotStart}deg) scale(.4)`,
+              opacity: 0,
+              offset: 0,
+              easing: 'cubic-bezier(.16, .8, .3, 1)' },
+            { transform: `translate(${originX + burstX}px, ${peakY}px) ${offsetTransform} rotate(${rotStart + 60}deg) scale(1)`,
+              opacity: 1,
+              offset: burstFrac,
+              easing: 'cubic-bezier(.5, 0, .85, .3)' },
+            { transform: `translate(${originX + burstX + drift}px, ${peakY + gravity}px) ${offsetTransform} rotate(${rotEnd}deg) scale(1)`,
+              opacity: 1,
+              offset: 1 }
+          ],
+          { duration, delay, easing: 'linear', fill: 'forwards' }
+        );
+
+        confettiEl.appendChild(piece);
+      }
+    }
+
+    function play() {
+      canvas.classList.remove('playing');
+      void canvas.offsetWidth; // force reflow so CSS animations restart
+      canvas.classList.add('playing');
+      spawnConfetti();
+    }
+
+    replay.addEventListener('click', play);
+
+    // Autoplay — wait a beat for fonts/layout to settle
+    setTimeout(play, 200);
+  </script>
+</body>
+</html>
