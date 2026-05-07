@@ -7,6 +7,7 @@ export default defineConfig({
       input: {
         index: resolve(__dirname, 'index.html'),
         successAnimation: resolve(__dirname, 'demos/success-animation.html'),
+        medallionAnimation: resolve(__dirname, 'demos/medallion-animation.html'),
       },
     },
   },

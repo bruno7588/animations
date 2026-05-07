@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medallion animation · Animations sandbox</title>
+  <link rel="stylesheet" href="/styles/page.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Page allows the 900x900 canvas to breathe past the 720 column */
+    .page.demo { max-width: none; padding-inline: 24px; }
+    .demo-stage { padding: 24px; overflow: auto; }
+
+    .medallion-canvas {
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(ellipse at 50% 40%, #2a2d3a 0%, #16181f 70%);
+      border-radius: 36px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 32px;
+      box-sizing: border-box;
+      isolation: isolate;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .stage {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      display: grid;
+      place-items: center;
+    }
+
+    .entrance {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    .medallion-canvas.playing .entrance {
+      animation: medallion-enter 600ms cubic-bezier(0.2, 0, 0, 1) forwards;
+    }
+
+    .glow {
+      position: absolute;
+      inset: -32px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 200, 80, 0.55) 0%, rgba(255, 187, 56, 0.25) 30%, transparent 65%);
+      filter: blur(12px);
+      opacity: 0;
+      z-index: 0;
+    }
+
+    .medallion-canvas.playing .glow {
+      animation:
+        glow-fade 600ms 200ms cubic-bezier(0.2, 0, 0, 1) forwards,
+        glow-pulse 2400ms 800ms ease-in-out infinite;
+    }
+
+    .rotator {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      z-index: 1;
+    }
+
+    .medallion-canvas.playing .rotator {
+      animation: spin 12000ms linear infinite;
+    }
+
+    .medallion {
+      width: 96px;
+      height: 96px;
+      display: block;
+      filter: drop-shadow(0 0 10px rgba(255, 195, 80, 0.55)) drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+    }
+
+    .shimmer {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .shimmer-mask {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      overflow: hidden;
+      -webkit-mask-image: url('/demos/assets/medallion.svg');
+      -webkit-mask-size: contain;
+      -webkit-mask-position: center;
+      -webkit-mask-repeat: no-repeat;
+              mask-image: url('/demos/assets/medallion.svg');
+              mask-size: contain;
+              mask-position: center;
+              mask-repeat: no-repeat;
+              mask-mode: alpha;
+    }
+
+    .shimmer-bar {
+      position: absolute;
+      top: -20%;
+      left: 0;
+      width: 40%;
+      height: 140%;
+      background: linear-gradient(
+        100deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.0) 35%,
+        rgba(255, 255, 255, 0.55) 50%,
+        rgba(255, 255, 255, 0.0) 65%,
+        transparent 80%
+      );
+      transform: translateX(-100%) rotate(8deg);
+      opacity: 0;
+    }
+
+    .medallion-canvas.playing .shimmer-bar {
+      animation: shimmer 2800ms 900ms ease-in-out infinite;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+      max-width: 800px;
+    }
+
+    .info .title,
+    .info .body,
+    .info .body--bold {
+      margin: 0;
+      line-height: 1.5;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .info .title {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      color: #f9f9fa;
+    }
+
+    .info .body,
+    .info .body--bold {
+      font-family: 'Poppins', sans-serif;
+      font-size: 16px;
+      color: #bfc2cc;
+    }
+
+    .info .body { font-weight: 400; }
+    .info .body--bold { font-weight: 700; }
+
+    .medallion-canvas.playing .info .title { animation: text-rise 480ms 480ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+    .medallion-canvas.playing .info .l1    { animation: text-rise 480ms 600ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+    .medallion-canvas.playing .info .l2    { animation: text-rise 480ms 720ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+    .medallion-canvas.playing .info .l3    { animation: text-rise 480ms 840ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+
+    .cta {
+      background: #00cee6;
+      color: #20222a;
+      border: 0;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      line-height: 1.5;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    .cta:hover { background: #00b9cf; }
+
+    .medallion-canvas.playing .cta {
+      animation: text-rise 480ms 980ms cubic-bezier(0.2, 0, 0, 1) forwards;
+    }
+
+    @keyframes medallion-enter {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes glow-fade {
+      to { opacity: 1; }
+    }
+
+    @keyframes glow-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50%      { transform: scale(1.08); opacity: 1; }
+    }
+
+    @keyframes shimmer {
+      0%   { transform: translateX(-100%) rotate(8deg); opacity: 0; }
+      15%  { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { transform: translateX(400%) rotate(8deg); opacity: 0; }
+    }
+
+    @keyframes text-rise {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .medallion-canvas.playing .entrance,
+      .medallion-canvas.playing .rotator,
+      .medallion-canvas.playing .glow,
+      .medallion-canvas.playing .shimmer-bar,
+      .medallion-canvas.playing .info .title,
+      .medallion-canvas.playing .info .l1,
+      .medallion-canvas.playing .info .l2,
+      .medallion-canvas.playing .info .l3,
+      .medallion-canvas.playing .cta {
+        animation: none;
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page demo">
+    <a class="demo-back" href="/">&larr; All animations</a>
+    <h1>Medallion animation</h1>
+    <p class="lede">Fade-in + slide up · immediate rotation · pulsing glow · shimmer sweep · staggered copy and CTA</p>
+
+    <div class="demo-stage">
+      <div class="medallion-canvas playing" id="canvas">
+        <div class="stage">
+          <div class="entrance">
+            <div class="glow"></div>
+            <div class="rotator">
+              <img class="medallion" src="/demos/assets/medallion.svg" alt="Medallion">
+            </div>
+            <div class="shimmer">
+              <div class="shimmer-mask">
+                <div class="shimmer-bar"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info">
+          <p class="title">Congratulations!</p>
+          <p class="body l1">Your certificate for completing the course</p>
+          <p class="body--bold l2">Creating Culture: Tips From the World&rsquo;s Top CEOs and Leaders</p>
+          <p class="body l3">is ready to download</p>
+        </div>
+
+        <button class="cta" type="button">Get Certificate</button>
+      </div>
+    </div>
+
+    <button class="demo-replay" id="replay">Replay</button>
+
+    <pre class="demo-source"><code>.entrance    { animation: medallion-enter 600ms  cubic-bezier(0.2, 0, 0, 1) forwards; }
+.rotator     { animation: spin            12000ms linear infinite; }
+.glow        { animation:
+                 glow-fade  600ms 200ms  cubic-bezier(0.2, 0, 0, 1) forwards,
+                 glow-pulse 2400ms 800ms ease-in-out infinite; }
+.shimmer-bar { animation: shimmer 2800ms 900ms ease-in-out infinite; }
+.title       { animation: text-rise 480ms 480ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+.l1          { animation: text-rise 480ms 600ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+.l2          { animation: text-rise 480ms 720ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+.l3          { animation: text-rise 480ms 840ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+.cta         { animation: text-rise 480ms 980ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+
+@keyframes medallion-enter { to { opacity: 1; transform: translateY(0); } }
+@keyframes spin            { to { transform: rotate(360deg); } }
+@keyframes glow-fade       { to { opacity: 1; } }
+@keyframes glow-pulse {
+  0%, 100% { transform: scale(1);    opacity: 0.85; }
+  50%      { transform: scale(1.08); opacity: 1; }
+}
+@keyframes shimmer {
+  0%        { transform: translateX(-100%) rotate(8deg); opacity: 0; }
+  15%, 85%  { opacity: 1; }
+  100%      { transform: translateX(400%) rotate(8deg); opacity: 0; }
+}
+@keyframes text-rise { to { opacity: 1; transform: translateY(0); } }
+
+/* Shimmer is masked to the medallion silhouette (mask-image: url(medallion.svg))
+   so the sheen stays inside the badge while the rotator spins underneath. */</code></pre>
+  </main>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const replay = document.getElementById('replay');
+
+    function play() {
+      canvas.classList.remove('playing');
+      void canvas.offsetWidth;
+      canvas.classList.add('playing');
+    }
+
+    replay.addEventListener('click', play);
+  </script>
+</body>
+</html>
