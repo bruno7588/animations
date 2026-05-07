@@ -158,9 +158,9 @@ function Styles() {
       }
       .medallion-glow {
         position: absolute;
-        inset: -32px;
-        background: radial-gradient(circle at 50% 50%, rgba(255, 200, 80, 0.55) 0%, rgba(255, 187, 56, 0.25) 30%, transparent 65%);
-        filter: blur(12px);
+        inset: -64px;
+        background: radial-gradient(circle at 50% 50%, rgba(255, 200, 80, 0.5) 0%, rgba(255, 187, 56, 0.26) 25%, rgba(255, 187, 56, 0.1) 50%, transparent 75%);
+        filter: blur(18px);
         z-index: 0;
         pointer-events: none;
       }
