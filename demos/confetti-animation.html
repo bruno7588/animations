@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confetti rain · Animations sandbox</title>
+  <link rel="stylesheet" href="/styles/page.css">
+  <style>
+    /* Dark canvas — mimics the full-screen "Program launched" overlay the
+       confetti ships into (5Mins.ai program launch success). */
+    .confetti-canvas {
+      position: relative;
+      width: 100%;
+      max-width: 960px;
+      height: 560px;
+      background: #20222a;
+      border-radius: 16px;
+      overflow: hidden;
+      isolation: isolate;
+      display: grid;
+      place-items: center;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    /* The confetti layer. A radial "safe zone" mask keeps pieces out of the
+       centre so they never cross the tick / copy / CTA. */
+    .confetti-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      -webkit-mask-image: radial-gradient(ellipse 300px 240px at 50% 50%, transparent 58%, black 62%);
+      mask-image: radial-gradient(ellipse 300px 240px at 50% 50%, transparent 58%, black 62%);
+    }
+
+    /* One confetti piece. Rectangles by default; --round makes a dot. */
+    .piece {
+      position: absolute;
+      top: 0;
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+    .piece--round {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    /* Centre content, purely for context — not part of the confetti. */
+    .confetti-center {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+    .confetti-center h2 { margin: 0; font-size: 24px; font-weight: 700; color: #f9f9fa; }
+    .confetti-center p  { margin: 0; font-size: 15px; color: rgba(249, 249, 250, 0.7); }
+
+    /* Reduced motion: no rain (matches the shipped component). */
+    @media (prefers-reduced-motion: reduce) {
+      .confetti-layer { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>Confetti rain</h1>
+    <p class="lede">
+      Depth-tiered confetti rain from the 5Mins.ai program launch success screen.
+      GSAP drives each piece (fall, side-sway, 3D tumble, edge fades); pieces
+      spawn for 3s then finish their fall. Deterministic (no random seed), so it
+      looks the same every play.
+    </p>
+
+    <div class="demo-stage">
+      <div class="confetti-canvas" id="canvas">
+        <div class="confetti-layer" id="confetti"></div>
+        <div class="confetti-center">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
+            <path d="M35.959 69.7246C54.5986 69.7246 69.709 54.6142 69.709 35.9746C69.709 17.335 54.5986 2.22461 35.959 2.22461C17.3194 2.22461 2.20898 17.335 2.20898 35.9746C2.20898 54.6142 17.3194 69.7246 35.959 69.7246Z" fill="#11763D"/>
+            <path d="M33.7652 67.0246C51.1933 67.0246 65.3215 52.8964 65.3215 35.4684C65.3215 18.0403 51.1933 3.91211 33.7652 3.91211C16.3372 3.91211 2.20898 18.0403 2.20898 35.4684C2.20898 52.8964 16.3372 67.0246 33.7652 67.0246Z" fill="#18A957"/>
+            <path d="M13.48 16.7094C16.0112 12.7156 21.4112 9.39687 27.0362 8.38437C28.4425 8.15937 29.8487 8.04688 31.03 8.49688C31.93 8.83438 32.6612 9.67812 32.155 10.6344C31.7612 11.4219 30.6925 11.7594 29.8487 12.0406C24.5725 13.7844 20.0219 17.2212 16.9112 21.8281C15.7862 23.5156 14.0987 28.1844 12.0175 27.0031C9.82374 25.7094 10.2737 21.6594 13.48 16.7094Z" fill="#A3DDBC"/>
+            <path d="M23.25 36.0056L31.74 44.4956L48.75 27.5156" stroke="#F9F9FA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <h2>Success!</h2>
+            <p>Your program is now live.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="demo-replay" id="replay">Replay</button>
+
+    <pre class="demo-source"><code>// 60 pieces across 3 depth tiers (far = small/slow/dim, near = big/fast).
+// Per piece: GSAP runs three tweens for the play window (~3s):
+gsap.set(el, { scale, transformPerspective: 600, autoAlpha: 0 });
+
+// 1. Fall: -10vh to 110vh, fading in at 8% and out at 90%.
+gsap.to(el, { keyframes: {
+  '0%':   { y: '-10vh', autoAlpha: 0 },
+  '8%':   { autoAlpha: opacity },
+  '90%':  { autoAlpha: opacity },
+  '100%': { y: '110vh', autoAlpha: 0 }, easeEach: 'none',
+}, duration, delay, repeat: plays - 1, ease: 'none' });
+
+// 2. Spin + 3D tumble, synced to the fall.
+gsap.to(el, { rotation, rotationX, rotationY, duration, delay, repeat: plays - 1, ease: 'none' });
+
+// 3. Side-to-side sway, continuous and unsynced for variety.
+gsap.to(el, { x: swayAmp, duration: swayDur, ease: 'sine.inOut', yoyo: true, repeat: -1 });</code></pre>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script>
+    // Palette (5Mins brand): amber, cyan, red, green, violet, orange.
+    const COLORS = ['#FFBB38', '#00CEE6', '#DF1642', '#18A957', '#8158EC', '#FF7A45'];
+
+    // New pieces spawn for this long; in-flight ones then finish their fall.
+    const RAIN_S = 3;
+
+    // Deterministic pseudo-random so the burst is identical every play.
+    const rand = (n) => {
+      const x = Math.sin(n * 999.13) * 43758.5453;
+      return x - Math.floor(x);
+    };
+
+    // Depth tiers give the flat rain a parallax feel.
+    const TIERS = [
+      { scale: 0.65, opacity: 0.75, durMin: 2.2, durSpan: 0.9 }, // far
+      { scale: 0.85, opacity: 0.9,  durMin: 1.7, durSpan: 0.8 }, // mid
+      { scale: 1.1,  opacity: 1,    durMin: 1.2, durSpan: 0.7 }, // near
+    ];
+
+    const CONFETTI = Array.from({ length: 60 }, (_, i) => {
+      const tier = TIERS[Math.floor(rand(i + 23) * TIERS.length)];
+      const delay = rand(i + 7) * 0.7;
+      const duration = tier.durMin + rand(i + 13) * tier.durSpan;
+      const plays = Math.max(1, Math.ceil((RAIN_S - delay) / duration));
+      return {
+        left: rand(i) * 100,
+        delay, duration, plays,
+        color: COLORS[i % COLORS.length],
+        round: rand(i + 17) < 0.34,
+        scale: tier.scale,
+        opacity: tier.opacity,
+        rot: (rand(i + 3) < 0.5 ? -1 : 1) * (360 + Math.round(rand(i + 5) * 720)),
+        swayAmp: (rand(i + 43) < 0.5 ? -1 : 1) * (16 + rand(i + 29) * 44),
+        swayDur: 0.6 + rand(i + 31) * 0.7,
+        tumbleX: 180 + Math.round(rand(i + 37) * 540),
+        tumbleY: 180 + Math.round(rand(i + 41) * 540),
+      };
+    });
+
+    const layer = document.getElementById('confetti');
+    const replay = document.getElementById('replay');
+
+    function build() {
+      layer.innerHTML = '';
+      CONFETTI.forEach((c) => {
+        const el = document.createElement('span');
+        el.className = 'piece' + (c.round ? ' piece--round' : '');
+        el.style.left = c.left + '%';
+        el.style.background = c.color;
+        layer.appendChild(el);
+      });
+    }
+
+    function play() {
+      gsap.killTweensOf('#confetti .piece');
+      build();
+      const pieces = layer.querySelectorAll('.piece');
+      pieces.forEach((el, i) => {
+        const c = CONFETTI[i];
+        gsap.set(el, { scale: c.scale, transformPerspective: 600, autoAlpha: 0 });
+        gsap.to(el, {
+          keyframes: {
+            '0%':   { y: '-10vh', autoAlpha: 0 },
+            '8%':   { autoAlpha: c.opacity },
+            '90%':  { autoAlpha: c.opacity },
+            '100%': { y: '110vh', autoAlpha: 0 },
+            easeEach: 'none',
+          },
+          duration: c.duration, delay: c.delay, repeat: c.plays - 1, ease: 'none',
+        });
+        gsap.to(el, {
+          rotation: c.rot, rotationX: c.tumbleX, rotationY: c.tumbleY,
+          duration: c.duration, delay: c.delay, repeat: c.plays - 1, ease: 'none',
+        });
+        gsap.to(el, { x: c.swayAmp, duration: c.swayDur, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      });
+    }
+
+    replay.addEventListener('click', play);
+    play();
+  </script>
+</body>
+</html>
