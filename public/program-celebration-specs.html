@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Program Celebration - Engineering Spec</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F9F9FA;
+      color: #20222A;
+      line-height: 1.6;
+    }
+    .page { max-width: 820px; margin: 0 auto; padding: 48px 24px 96px; }
+    .back { display: inline-block; text-decoration: none; color: #6B7280; font-size: 14px; margin-bottom: 24px; }
+    .back:hover { color: #20222A; }
+    .hero {
+      background: white; border: 1px solid #E5E7EB; border-radius: 16px;
+      padding: 28px 32px; margin-bottom: 32px;
+      display: flex; align-items: center; gap: 20px;
+    }
+    .hero svg { flex: 0 0 auto; }
+    h1 { margin: 0 0 4px; font-size: 26px; font-weight: 700; }
+    .hero p { margin: 0; color: #6B7280; font-size: 14px; }
+    .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .badge { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+    .badge.hifi { background: #E7F9EE; color: #11763D; }
+    .badge.gsap { background: #EAF6FC; color: #00838F; }
+    .cta-row { display: flex; gap: 12px; margin: 0 0 40px; flex-wrap: wrap; }
+    .cta {
+      display: inline-block; text-decoration: none; padding: 12px 22px;
+      border-radius: 14px; font-weight: 700; font-size: 14px;
+      transition: background 160ms cubic-bezier(.2,0,0,1), border-color 120ms ease;
+    }
+    .cta.primary { background: #00AFC4; color: #fff; }
+    .cta.primary:hover { background: #00A5B8; }
+    .cta.ghost { background: #fff; color: #20222A; border: 1px solid #E5E7EB; }
+    .cta.ghost:hover { border-color: #00CEE6; }
+    h2 { font-size: 18px; font-weight: 700; margin: 40px 0 12px; padding-top: 8px; }
+    h3 { font-size: 15px; font-weight: 600; margin: 24px 0 8px; }
+    p, li { font-size: 14px; }
+    .card { background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 20px 24px; margin: 12px 0; }
+    ul { padding-left: 20px; margin: 8px 0; }
+    li { margin: 4px 0; }
+    code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; background: #F0F1F3; padding: 1px 6px; border-radius: 5px; color: #20222A; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13.5px; }
+    th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid #EDEEF1; vertical-align: top; }
+    th { font-weight: 600; color: #6B7280; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+    td code { font-size: 12px; }
+    .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin: 12px 0; }
+    .sw { display: flex; align-items: center; gap: 8px; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+    .chip { width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgba(0,0,0,.08); }
+    .note { background: #FFF8E9; border: 1px solid #FCE9BE; border-radius: 10px; padding: 14px 18px; font-size: 13.5px; color: #5C4A12; margin: 16px 0; }
+    .seq { counter-reset: step; }
+    .phase { font-weight: 700; color: #00838F; margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <a class="back" href="/">&larr; Animations sandbox</a>
+
+    <div class="hero">
+      <svg width="56" height="56" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="36" cy="36" r="36" fill="#11763D"/>
+        <circle cx="36" cy="36" r="30" fill="#18A957"/>
+        <path d="M18 22a30 30 0 0 1 22-9" stroke="#A3DDBC" stroke-width="6" stroke-linecap="round"/>
+        <path d="M23.25 36.0056L31.74 44.4956L48.75 27.5156" stroke="#F9F9FA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <h1>Program Celebration</h1>
+        <p>Full-screen success moment shown after a user publishes a learning program.</p>
+        <div class="badges">
+          <span class="badge hifi">Hi-fi &middot; timing accurate</span>
+          <span class="badge gsap">Prototype: GSAP</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <a class="cta primary" href="/program-celebration.html">Open interactive sandbox &rarr;</a>
+      <a class="cta ghost" href="/program-celebration.html">Replay animation</a>
+    </div>
+
+    <div class="note">
+      <strong>The floating DialKit panel in the sandbox is a design-time tuning tool only.</strong> Do not ship it. The values it exposes are already baked in as the documented defaults below. Recreate this in the target codebase using its established animation primitive (GSAP, Motion/Framer Motion, CSS keyframes, Lottie) as long as timing and easing match.
+    </div>
+
+    <h2>Layout</h2>
+    <div class="card">
+      <ul>
+        <li>Full-bleed container: <code>100% &times; 100vh</code>, min-height <code>640px</code>, <code>overflow:hidden</code>, background <code>#F9F9FA</code>. Contents centered both axes (flex column).</li>
+        <li>Content column: <code>flex-direction:column; align-items:center; gap:24px; text-align:center; padding:24px;</code> at <code>z-index:2</code>.</li>
+        <li>Confetti layer: absolutely positioned <code>inset:0</code>, <code>pointer-events:none</code>, <code>z-index:1</code> (behind the content, reads as a backdrop).</li>
+      </ul>
+    </div>
+
+    <h2>Components (top to bottom)</h2>
+
+    <h3>1. Tick badge</h3>
+    <div class="card">
+      <ul>
+        <li>Wrapper <code>72&times;72px</code>, <code>position:relative</code>, starts <code>opacity:0</code>.</li>
+        <li>Pulse ring: <code>inset:0</code>, <code>border-radius:50%</code>, <code>border:3px solid rgba(24,169,87,.4)</code>.</li>
+        <li>SVG <code>72&times;72</code>, viewBox <code>0 0 72 72</code> - filled green circle check. Outer fill <code>#11763D</code>, front <code>#18A957</code>, top-left highlight arc <code>#A3DDBC</code>. Check stroke <code>#F9F9FA</code>, <code>stroke-width:4</code>, round caps/joins, path <code>M23.25 36.0056L31.74 44.4956L48.75 27.5156</code>.</li>
+        <li>Copy the SVG verbatim from the sandbox source.</li>
+      </ul>
+    </div>
+
+    <h3>2. Headline &middot; 3. Description</h3>
+    <div class="card">
+      <ul>
+        <li><strong>"Success!"</strong> - Poppins <code>20px / 700 / 150%</code>, color <code>#20222A</code>. Enters <code>opacity 0&rarr;1</code>, <code>translateY(24&rarr;0)</code>.</li>
+        <li><strong>"Your program is now live."</strong> - Poppins <code>16px / 400 / 150%</code>, color <code>#6B6F7B</code>, <code>max-width:420px</code>.</li>
+        <li>Title + description wrapped in an <code>8px</code>-gap column.</li>
+      </ul>
+    </div>
+
+    <h3>4. CTA button</h3>
+    <div class="card">
+      <ul>
+        <li><strong>"Track Progress"</strong> - Poppins <code>14px / 700 / 150%</code>, color <code>#FFFFFF</code>.</li>
+        <li>Background <code>#00AFC4</code>; hover <code>#00A5B8</code>; active <code>#00838F</code>. <code>transition: background 160ms cubic-bezier(.2,0,0,1)</code>.</li>
+        <li><code>padding:10px 20px</code>, <code>border-radius:16px</code>, no border, <code>margin-top:8px</code>.</li>
+        <li>In production, wire to its real action (e.g. navigate to progress view).</li>
+      </ul>
+    </div>
+
+    <h2>Interactions &amp; timing</h2>
+    <p>All times in seconds from animation start. Easing names are GSAP.</p>
+
+    <div class="card seq">
+      <p class="phase">Phase 1 - Tick (t=0)</p>
+      <ul>
+        <li>Tick wrapper: <code>opacity&rarr;1</code>, <code>scale 0&rarr;1</code>, <code>0.55s</code>, ease <code>back.out(2.2)</code>, transform-origin center.</li>
+        <li>Check draw-on: <code>stroke-dashoffset full&rarr;0</code>, <code>0.4s</code>, ease <code>power2.out</code>, starting <code>0.2s before</code> the tick pop finishes.</li>
+        <li>Pulse ring: <code>scale 1&rarr;1.35</code>, <code>opacity 1&rarr;0</code>, <code>0.7s</code>, ease <code>power1.out</code>, starting <code>0.35s before</code> prior step ends.</li>
+      </ul>
+
+      <p class="phase">Phase 2 - Text &amp; button (start delay 0.55s, stagger 0.18s)</p>
+      <ul>
+        <li>Headline @ <code>0.55s</code>: <code>opacity 0&rarr;1</code>, <code>translateY 24&rarr;0</code>, <code>0.5s</code>, ease <code>power3.out</code>.</li>
+        <li>Description @ <code>0.73s</code>: same tween/ease as headline.</li>
+        <li>Button @ <code>0.91s</code>: <code>opacity 0&rarr;1</code>, <code>translateY 24&rarr;0</code>, <code>0.5s</code>, ease <code>back.out(1.7)</code>.</li>
+      </ul>
+
+      <p class="phase">Phase 3 - Confetti (launches at start, behind content)</p>
+      <ul>
+        <li><strong>Count: 220</strong> pieces per replay. Each has a random start delay of <code>0 - 0.35s</code>.</li>
+        <li>Shape mix: ~45% rectangle strips, ~30% circles, ~25% thin ribbons. Base size random <code>6 - 18px</code>.
+          <ul>
+            <li>Strip: <code>w=size</code>, <code>h=size*0.45</code>, <code>border-radius:2px</code></li>
+            <li>Circle: <code>w=h=size*0.7</code>, <code>border-radius:50%</code></li>
+            <li>Ribbon: <code>w=size*0.35</code>, <code>h=size*1.6</code>, <code>border-radius:999px</code></li>
+          </ul>
+        </li>
+        <li>Spawn: <code>left</code> random across width; start <code>y = -30 - random(0..30% of height)</code>; random initial <code>rotation 0-360&deg;</code>, initial <code>scale 0.7-1.4</code>.</li>
+        <li>Fall: <code>y &rarr; containerHeight + 60</code>, <strong>duration random 2 - 6s per piece</strong>, ease <code>power1.in</code>. Piece removed from DOM on completion.</li>
+        <li>Sway: <code>x &rarr; &plusmn;(random 0..220px)</code>, ease <code>sine.inOut</code>, same duration as fall.</li>
+        <li>Spin: <code>rotation += (360 + random 0..720)&deg;</code>, random direction, linear, same duration.</li>
+        <li>Tumble: <code>rotationX &rarr; random 0..720&deg;</code>, linear, same duration (needs 3D / GSAP <code>rotationX</code>).</li>
+      </ul>
+    </div>
+
+    <div class="note">
+      <strong>Reset on replay:</strong> check dasharray/offset reset to full, tick <code>scale:0 opacity:0</code>, ring <code>scale:1 opacity:1</code>, text/button <code>opacity:0 translateY(24)</code>, confetti layer cleared (<code>innerHTML=""</code>) before re-launch.
+    </div>
+
+    <h2>Confetti palette (5Mins gamification)</h2>
+    <div class="card">
+      <div class="swatches">
+        <span class="sw"><span class="chip" style="background:#00CEE6"></span>#00CEE6</span>
+        <span class="sw"><span class="chip" style="background:#33E2F7"></span>#33E2F7</span>
+        <span class="sw"><span class="chip" style="background:#8158EC"></span>#8158EC</span>
+        <span class="sw"><span class="chip" style="background:#9B55C9"></span>#9B55C9</span>
+        <span class="sw"><span class="chip" style="background:#6368DB"></span>#6368DB</span>
+        <span class="sw"><span class="chip" style="background:#FA715F"></span>#FA715F</span>
+        <span class="sw"><span class="chip" style="background:#2A90D8"></span>#2A90D8</span>
+        <span class="sw"><span class="chip" style="background:#FFBB38"></span>#FFBB38</span>
+        <span class="sw"><span class="chip" style="background:#18A957"></span>#18A957</span>
+        <span class="sw"><span class="chip" style="background:#DF1642"></span>#DF1642</span>
+      </div>
+    </div>
+
+    <h2>Design tokens</h2>
+    <table>
+      <thead><tr><th>Token</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Page background</td><td><code>#F9F9FA</code></td></tr>
+        <tr><td>Ink / headline</td><td><code>#20222A</code></td></tr>
+        <tr><td>Muted text</td><td><code>#6B6F7B</code></td></tr>
+        <tr><td>Button (base / hover / active)</td><td><code>#00AFC4</code> / <code>#00A5B8</code> / <code>#00838F</code></td></tr>
+        <tr><td>Tick greens</td><td><code>#11763D</code>, <code>#18A957</code>, <code>#A3DDBC</code>; stroke <code>#F9F9FA</code>; ring <code>rgba(24,169,87,.4)</code></td></tr>
+        <tr><td>Typography</td><td>Poppins 400 / 700 - Headline 20/700, Description 16/400, Button 14/700, all 150% line-height</td></tr>
+        <tr><td>Spacing</td><td>column gap <code>24px</code>; title/desc gap <code>8px</code>; button <code>margin-top 8px</code>; padding <code>24px</code></td></tr>
+        <tr><td>Radii</td><td>button <code>16px</code>; ring <code>50%</code>; confetti <code>2px</code> / <code>50%</code> / <code>999px</code></td></tr>
+      </tbody>
+    </table>
+
+    <h2>Notes for implementers</h2>
+    <div class="card">
+      <ul>
+        <li>Confetti sits <strong>behind</strong> the tick/text/button (<code>z-index</code>) - a backdrop, not an overlay.</li>
+        <li>Respect <code>prefers-reduced-motion</code>: show the end state (tick + text + button visible, no confetti) when the user opts out.</li>
+        <li>Pieces are created/destroyed per run - pool or cap them if the celebration can fire rapidly.</li>
+        <li>If reused as a component, expose props for copy (<code>title</code>, <code>subtitle</code>, <code>buttonLabel</code>) and an <code>onCtaClick</code> callback. No persisted state.</li>
+      </ul>
+    </div>
+  </main>
+</body>
+</html>

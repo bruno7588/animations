@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/5mins-design-system-6014141d-0e52-4914-bb38-1e828f51bc7e/colors_and_type.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    html, body { height: 100%; }
+    body { margin: 0; background: #F9F9FA; }
+    a { color: #00CEE6; } a:hover { color: #00A5B8; }
+  </style>
+</helmet>
+<div ref="{{ rootRef }}" data-screen-label="Celebration" style="position: relative; width: 1536px; height: 864px; overflow: hidden; background: #F9F9FA; font-family: 'Poppins', sans-serif; display: flex; align-items: center; justify-content: center;">
+  <div ref="{{ confettiRef }}" style="position: absolute; inset: 0; pointer-events: none; z-index: 1;"></div>
+  <div style="position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; padding: 24px;">
+    <div ref="{{ tickWrapRef }}" style="position: relative; width: 72px; height: 72px; opacity: 0;">
+      <div ref="{{ ringRef }}" style="position: absolute; inset: 0; border-radius: 50%; border: 3px solid rgba(24,169,87,.4);"></div>
+      <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="position: relative;">
+        <path d="M35.959 69.7246C54.5986 69.7246 69.709 54.6142 69.709 35.9746C69.709 17.335 54.5986 2.22461 35.959 2.22461C17.3194 2.22461 2.20898 17.335 2.20898 35.9746C2.20898 54.6142 17.3194 69.7246 35.959 69.7246Z" fill="#11763D"></path>
+        <path d="M33.7652 67.0246C51.1933 67.0246 65.3215 52.8964 65.3215 35.4684C65.3215 18.0403 51.1933 3.91211 33.7652 3.91211C16.3372 3.91211 2.20898 18.0403 2.20898 35.4684C2.20898 52.8964 16.3372 67.0246 33.7652 67.0246Z" fill="#18A957"></path>
+        <path d="M13.48 16.7094C16.0112 12.7156 21.4112 9.39687 27.0362 8.38437C28.4425 8.15937 29.8487 8.04688 31.03 8.49688C31.93 8.83438 32.6612 9.67812 32.155 10.6344C31.7612 11.4219 30.6925 11.7594 29.8487 12.0406C24.5725 13.7844 20.0219 17.2212 16.9112 21.8281C15.7862 23.5156 14.0987 28.1844 12.0175 27.0031C9.82374 25.7094 10.2737 21.6594 13.48 16.7094Z" fill="#A3DDBC"></path>
+        <path ref="{{ checkRef }}" d="M23.25 36.0056L31.74 44.4956L48.75 27.5156" stroke="#F9F9FA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+      <h1 ref="{{ titleRef }}" style="margin: 0; font-size: 20px; line-height: 150%; font-weight: 700; color: #20222A; opacity: 0;">{{ title }}</h1>
+      <p ref="{{ subtitleRef }}" style="margin: 0; font-size: 16px; line-height: 150%; font-weight: 400; color: #6B6F7B; max-width: 420px; opacity: 0;">{{ subtitle }}</p>
+    </div>
+    <button ref="{{ buttonRef }}" onClick="{{ replay }}" style="margin-top: 8px; border: none; cursor: pointer; background: #00AFC4; color: #FFFFFF; font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 700; line-height: 150%; padding: 10px 20px; border-radius: 16px; opacity: 0; transition: background 160ms cubic-bezier(.2,0,0,1);" style-hover="background: #00A5B8;" style-active="background: #00838F;">{{ buttonLabel }}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1536, &quot;height&quot;: 864}, &quot;title&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;string&quot;}, &quot;subtitle&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;string&quot;}, &quot;buttonLabel&quot;: {&quot;editor&quot;: null, &quot;tsType&quot;: &quot;string&quot;}, &quot;showDials&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.rootRef = React.createRef();
+    this.confettiRef = React.createRef();
+    this.tickWrapRef = React.createRef();
+    this.ringRef = React.createRef();
+    this.checkRef = React.createRef();
+    this.titleRef = React.createRef();
+    this.subtitleRef = React.createRef();
+    this.buttonRef = React.createRef();
+    // Live-tunable parameters (defaults). DialKit overwrites these in real time.
+    this.params = {
+      tick: { popDuration: 0.55, overshoot: 2.2, checkDraw: 0.4 },
+      text: { startDelay: 0.55, stagger: 0.18, duration: 0.5 },
+      confetti: { count: 220, minFall: 2, maxFall: 6, sway: 220, minSize: 6, maxSize: 18 },
+    };
+  }
+  componentDidMount() {
+    const wait = () => {
+      if (window.gsap) this.play();
+      else setTimeout(wait, 60);
+    };
+    wait();
+    this.initDialKit();
+  }
+  componentWillUnmount() {
+    if (this._dialRoot) { try { this._dialRoot.unmount(); } catch (e) {} }
+    if (this._dialHost && this._dialHost.parentNode) this._dialHost.parentNode.removeChild(this._dialHost);
+  }
+  async initDialKit() {
+    if (this.props.showDials === false) return;
+    if (this._dialLoaded) return;
+    this._dialLoaded = true;
+    try {
+      const V = '1.2.0', RV = '18.3.1';
+      const [R, RD, DK] = await Promise.all([
+        import(`https://esm.sh/react@${RV}`),
+        import(`https://esm.sh/react-dom@${RV}/client`),
+        import(`https://esm.sh/dialkit@${V}?deps=react@${RV},react-dom@${RV},motion`),
+      ]);
+      if (!document.getElementById('dialkit-css')) {
+        const link = document.createElement('link');
+        link.id = 'dialkit-css'; link.rel = 'stylesheet';
+        link.href = `https://esm.sh/dialkit@${V}/dist/styles.css`;
+        document.head.appendChild(link);
+      }
+      const config = {
+        tick: {
+          popDuration: [0.55, 0.1, 1.5],
+          overshoot: [2.2, 1, 4],
+          checkDraw: [0.4, 0.1, 1],
+        },
+        text: {
+          startDelay: [0.55, 0, 2],
+          stagger: [0.18, 0, 0.6],
+          duration: [0.5, 0.1, 1.2],
+        },
+        confetti: {
+          count: [220, 20, 500, 10],
+          minFall: [2, 0.5, 5],
+          maxFall: [6, 1, 10],
+          sway: [220, 0, 500],
+          minSize: [6, 2, 20],
+          maxSize: [18, 6, 40],
+        },
+        replay: { type: 'action', label: 'Replay animation' },
+      };
+      const self = this;
+      const Panel = () => {
+        const p = DK.useDialKit('Confetti party', config, {
+          onAction: (path) => { if (path === 'replay') self.play(); },
+        });
+        R.useEffect(() => { self.params = p; }, [p]);
+        return null;
+      };
+      this._dialHost = document.createElement('div');
+      document.body.appendChild(this._dialHost);
+      this._dialRoot = RD.createRoot(this._dialHost);
+      this._dialRoot.render(
+        R.createElement(R.Fragment, null,
+          R.createElement(Panel, null),
+          R.createElement(DK.DialRoot, { position: 'top-right', defaultOpen: true, productionEnabled: true })
+        )
+      );
+    } catch (e) {
+      console.warn('DialKit failed to load', e);
+    }
+  }
+  play() {
+    const gsap = window.gsap;
+    const P = this.params;
+    const tick = this.tickWrapRef.current, ring = this.ringRef.current, check = this.checkRef.current;
+    const title = this.titleRef.current, sub = this.subtitleRef.current, btn = this.buttonRef.current;
+    if (!tick) return;
+    const checkLen = check.getTotalLength();
+    gsap.set(check, { strokeDasharray: checkLen, strokeDashoffset: checkLen });
+    gsap.set(tick, { opacity: 1, scale: 0, transformOrigin: '50% 50%' });
+    gsap.set(ring, { scale: 1, opacity: 1 });
+    gsap.set([title, sub, btn], { opacity: 0, y: 24 });
+    const tl = gsap.timeline();
+    // 1. tick pops in with spring overshoot + check stroke draw + pulse ring
+    tl.to(tick, { scale: 1, duration: P.tick.popDuration, ease: `back.out(${P.tick.overshoot})` })
+      .to(check, { strokeDashoffset: 0, duration: P.tick.checkDraw, ease: 'power2.out' }, '-=0.2')
+      .to(ring, { scale: 1.35, opacity: 0, duration: 0.7, ease: 'power1.out' }, '-=0.35')
+      // 2. text follows after a small delay, staggered
+      .to(title, { opacity: 1, y: 0, duration: P.text.duration, ease: 'power3.out' }, P.text.startDelay)
+      .to(sub, { opacity: 1, y: 0, duration: P.text.duration, ease: 'power3.out' }, P.text.startDelay + P.text.stagger)
+      .to(btn, { opacity: 1, y: 0, duration: P.text.duration, ease: 'back.out(1.7)' }, P.text.startDelay + P.text.stagger * 2);
+    // 3. confetti explosion, top to bottom
+    this.launchConfetti();
+  }
+  launchConfetti() {
+    const gsap = window.gsap;
+    const C = this.params.confetti;
+    const layer = this.confettiRef.current, root = this.rootRef.current;
+    if (!layer) return;
+    layer.innerHTML = '';
+    const W = root.clientWidth, H = root.clientHeight;
+    const colors = ['#00CEE6', '#33E2F7', '#8158EC', '#9B55C9', '#6368DB', '#FA715F', '#2A90D8', '#FFBB38', '#18A957', '#DF1642'];
+    const count = Math.round(C.count);
+    const sizeSpan = Math.max(0, C.maxSize - C.minSize);
+    const fallSpan = Math.max(0, C.maxFall - C.minFall);
+    for (let i = 0; i < count; i++) {
+      const el = document.createElement('div');
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      const size = C.minSize + Math.random() * sizeSpan;
+      const kind = Math.random();
+      el.style.position = 'absolute';
+      el.style.left = (Math.random() * W) + 'px';
+      el.style.top = '0px';
+      el.style.willChange = 'transform';
+      if (kind < 0.45) { // rectangle strip
+        el.style.width = size + 'px'; el.style.height = (size * 0.45) + 'px';
+        el.style.background = color; el.style.borderRadius = '2px';
+      } else if (kind < 0.75) { // circle
+        el.style.width = (size * 0.7) + 'px'; el.style.height = (size * 0.7) + 'px';
+        el.style.background = color; el.style.borderRadius = '50%';
+      } else { // ribbon
+        el.style.width = (size * 0.35) + 'px'; el.style.height = (size * 1.6) + 'px';
+        el.style.background = color; el.style.borderRadius = '999px';
+      }
+      layer.appendChild(el);
+      const fallDur = C.minFall + Math.random() * fallSpan;
+      const delay = Math.random() * 0.35;
+      const sway = (Math.random() - 0.5) * 2 * C.sway;
+      gsap.set(el, { y: -30 - Math.random() * H * 0.3, rotation: Math.random() * 360, scale: 0.7 + Math.random() * 0.7 });
+      gsap.to(el, { y: H + 60, duration: fallDur, delay, ease: 'power1.in', onComplete: () => el.remove() });
+      gsap.to(el, { x: sway, duration: fallDur, delay, ease: 'sine.inOut' });
+      gsap.to(el, { rotation: '+=' + (360 + Math.random() * 720) * (Math.random() < 0.5 ? -1 : 1), duration: fallDur, delay, ease: 'none' });
+      gsap.to(el, { rotationX: Math.random() * 720, duration: fallDur, delay, ease: 'none' });
+    }
+  }
+  renderVals() {
+    return {
+      rootRef: this.rootRef, confettiRef: this.confettiRef, tickWrapRef: this.tickWrapRef,
+      ringRef: this.ringRef, checkRef: this.checkRef, titleRef: this.titleRef,
+      subtitleRef: this.subtitleRef, buttonRef: this.buttonRef,
+      title: this.props.title ?? 'Success!',
+      subtitle: this.props.subtitle ?? 'Your program is now live.',
+      buttonLabel: this.props.buttonLabel ?? 'Track Progress',
+      replay: () => this.play(),
+    };
+  }
+}
+</script>
+</body>
+</html>
